@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Self-hosted fonts, pulled from Google Fonts. Each family ships as TWO files
+   split on unicode-range exactly as Google serves them: `latin` is ASCII and
+   Latin-1, `latin-ext` carries č, ć, š, ž and đ. Never drop the latin-ext
+   blocks — every Croatian sentence on the site needs them.
+
+   Fredoka is variable (300–700). Poppins is static, and only 400 and 600 are
+   shipped: do not use another Poppins weight or the browser will fake it. */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('../fonts/fredoka-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('../fonts/fredoka-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/poppins-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/poppins-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/poppins-600-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/poppins-600-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* The navbar floats over the page, so an anchor jump has to stop short of
+     the section's own top. */
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  body {
+    @apply font-sans font-normal text-ink bg-peach antialiased;
+  }
+
+  ::selection {
+    background: theme('colors.sun.DEFAULT');
+    color: theme('colors.ink.DEFAULT');
+  }
+}
+
+@layer components {
+  .label {
+    @apply font-sans text-[12px] font-semibold tracking-[0.18em] uppercase text-ink-soft;
+  }
+
+  .section-heading {
+    @apply font-display font-semibold text-teal-deep leading-[1.15];
+    font-size: clamp(2rem, 4.6vw, 3rem);
+  }
+
+  .lede {
+    @apply font-sans text-base sm:text-lg text-ink-soft leading-relaxed;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-7 py-3.5
+           bg-teal-deep text-cream font-sans font-semibold text-[15px]
+           rounded-full shadow-soft transition-colors duration-300 hover:bg-ink;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-7 py-3.5
+           bg-cream text-teal-deep font-sans font-semibold text-[15px]
+           rounded-full shadow-soft transition-colors duration-300 hover:text-ink;
+  }
+
+  .card {
+    @apply bg-cream rounded-soft p-7 sm:p-8 shadow-soft;
+  }
+
+  /* ── Motion ────────────────────────────────────────────── */
+  /* The hidden state is scoped to `.reveal-ready`, which App.jsx adds on
+     mount, so the prerendered page stays visible if JavaScript never runs. */
+  .reveal-ready .reveal {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+
+  .reveal-ready .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal-ready .reveal,
+  .reveal-ready .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

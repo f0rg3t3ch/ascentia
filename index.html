@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="hr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ONLY THE TAGS THAT ARE IDENTICAL ON BOTH LANGUAGE PAGES LIVE HERE.
+         The site is prerendered twice, as / (Croatian) and /en/ (English).
+         Everything that differs between them — <title>, the description, the
+         canonical, hreflang, Open Graph and the JSON-LD — is rendered per
+         route by src/components/Seo.jsx, which also sets `lang`. -->
+
+    <!-- PRE-LAUNCH SWITCH. The client has not signed the draft off, so the
+         site is kept out of search. Remove this one line to launch — see
+         CLAUDE.md → "Launch checklist". robots.txt deliberately still allows
+         crawling, or Google would never see this tag. -->
+    <meta name="robots" content="noindex, follow" />
+
+    <meta name="theme-color" content="#F7D2BF" />
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+
+    <!-- Self-hosted fonts; see src/index.css. The latin-ext half of Fredoka
+         is preloaded because the Croatian headings need č, ć, š, ž and đ. -->
+    <link rel="preload" as="font" type="font/woff2" href="./fonts/fredoka-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="./fonts/fredoka-latin-ext.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="./fonts/poppins-400-latin.woff2" crossorigin />
+
+    <!-- These './' paths are rewritten to '../' for /en/index.html by the
+         onPageRendered hook in vite.config.js. -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

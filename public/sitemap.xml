@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- One <url> per language, each listing itself and its alternate; mirrors
+     the hreflang set src/components/Seo.jsx puts in each page's head.
+     Bump both <lastmod> values whenever the page content changes. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://f0rg3t3ch.github.io/ascentia/</loc>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://f0rg3t3ch.github.io/ascentia/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://f0rg3t3ch.github.io/ascentia/en/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://f0rg3t3ch.github.io/ascentia/" />
+    <lastmod>2026-10-03</lastmod>
+  </url>
+  <url>
+    <loc>https://f0rg3t3ch.github.io/ascentia/en/</loc>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://f0rg3t3ch.github.io/ascentia/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://f0rg3t3ch.github.io/ascentia/en/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://f0rg3t3ch.github.io/ascentia/" />
+    <lastmod>2026-10-03</lastmod>
+  </url>
+</urlset>

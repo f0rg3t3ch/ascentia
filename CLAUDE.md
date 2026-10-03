@@ -1,0 +1,173 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this project is
+
+A one-page static site for **Ascentia Education**, an education centre in Supetar on the island of Brač,
+Croatia. It is built **twice, once per language** — `/` in Croatian and `/en/` in English — from one set of
+components and two dictionaries.
+
+**This is a first draft that the client has not seen yet.** Expect the copy, the sections and the look to
+change. Read "What's real, what's a draft" before writing any content.
+
+It is a sibling of `word-and-rijec-dot-com`, `guy-catz-dot-com` and `veli-bol-home` (currently under
+`~/repositories/xarlos89@github.com/`) and was ported from the first of those. When something here is
+unclear, `word-and-rijec-dot-com` and its `CLAUDE.md` are the reference.
+
+## Commands
+
+```bash
+source ~/.nvm/nvm.sh   # a non-interactive shell otherwise finds apt's Node 18
+npm install
+npm run dev      # Vite dev server, http://localhost:5173
+npm run build    # prerender both pages to dist/ via vite-react-ssg
+npm run preview  # serve the built dist/
+```
+
+No tests, linter or typechecker. `npm run build` is the only gate: it prerenders both pages, so a runtime
+error or a mismatch between the two dictionaries fails the build.
+
+## Stack and layout
+
+React 18, Vite 5 (`base: './'`), `vite-react-ssg`, Tailwind 3, react-router-dom (as a build-time page list
+only). No backend, no analytics, no form.
+
+```
+index.html              <head>: only what is identical in both languages, incl. the pre-launch noindex
+src/
+  main.jsx              vite-react-ssg entry + runtime basename detection
+  routes.jsx            one route per language
+  App.jsx               the page: Hero, Programmes, Learning, Contact, Footer
+  siteInfo.js           language-independent facts: name, phone, email, address, canonical origin
+  i18n/locales.js       locale table and the relative-path maths
+  i18n/hr.js  en.js     every user-visible string
+  i18n/index.jsx        <LangProvider>, useLang(), the same-shape assertion
+  images.js             asset() / responsivePhoto() — use the bound copies off useLang()
+  components/           Navbar, Footer, LangSwitch, Wordmark, PuzzlePiece, Photo, Reveal, Seo
+  sections/             Hero, Programmes, Learning, Contact
+public/                 fonts, images, icons, og.jpg, robots, sitemap, 404
+```
+
+## Two languages
+
+| URL | file | `<html lang>` | dictionary |
+| --- | --- | --- | --- |
+| `/` | `dist/index.html` | `hr` | `src/i18n/hr.js` |
+| `/en/` | `dist/en/index.html` | `en` | `src/i18n/en.js` |
+
+Croatian is the root and `x-default`: the centre serves local families first.
+
+- **The language comes from the route, never from state.** No toggle state, no `localStorage`.
+- **No user-visible text in a component.** Put it in both dictionaries under the same key and read it with
+  `const { t } = useLang()`. `src/i18n/index.jsx` asserts the two have identical shapes and throws during
+  the build, naming the key. The one exception is `hero.slogan` (listed in `FREE_LENGTH`), which is split
+  into colour chunks and has five in Croatian to six in English.
+- **`<LangSwitch>`** shows both languages, `HR | EN`, with the current one filled. It is in the navbar at
+  every width and again in the footer. Its links are plain `<a>`s: changing language loads the other
+  document.
+
+### Relative paths — the two traps
+
+`base: './'` lets one build run at a domain root and under `f0rg3t3ch.github.io/ascentia/`. It has two
+consequences:
+
+1. **Assets from a page one directory down.** `./assets/x` inside `/en/index.html` resolves to
+   `/en/assets/x`. The `onPageRendered` hook in `vite.config.js` rewrites what Vite emits; our own
+   references go through `asset()` / `responsivePhoto()` **taken off `useLang()`**, and the switcher uses
+   `localeHref()`. Never write a root-relative `/en/` or `/images/…`.
+2. **The router under a sub-path.** react-router matches the full pathname, and `/ascentia/` is not a
+   route, so without help the prerendered page is replaced by "404 Not Found" on hydration.
+   `detectBasename()` in `src/main.jsx` works the mount point out from the address bar. `npm run preview`
+   serves at `/` and will not show this bug — to test it, serve `dist/` from a directory named `ascentia`
+   one level up (`python3 -m http.server`) and open `/ascentia/` and `/ascentia/en/`.
+
+## Brand
+
+Everything comes from the client's own social-media posters (peach ground, teal brush wordmark, puzzle
+pieces, a word-per-colour slogan). The hex values were sampled from those images.
+
+| token | hex | use |
+| --- | --- | --- |
+| `peach` | `#F7D2BF` | the main ground |
+| `sage` | `#A9C9A2` | the alternate ground |
+| `teal` / `teal-deep` | `#1C84A4` / `#0F5F78` | the wordmark colour / headings, buttons, links |
+| `mauve`, `sun` | `#B88CA0`, `#F4C442` | puzzle pieces, badges, accents — fills only |
+| `berry` | `#B85884` | the "Learn Croatian and English!" headline (large type only) |
+| `sage-deep`, `mauve-deep`, `sun-deep` | see `tailwind.config.js` | the slogan words; the poster tones are too pale to read as type on peach |
+| `cream` | `#FFF8F2` | cards and the navbar pill |
+| `ink` / `ink-soft` | `#23343B` / `#3F5058` | body type |
+
+`teal` is only about 3:1 on peach, and `teal-deep` about 4:1 on sage: both are for large type. Body text is
+`ink`. The posters set white text on peach; the site does not, because it cannot be read. These ratios
+were worked out by hand, not with a tool — re-check them before adding a colour for type.
+
+**Type.** Fredoka (variable, 300–700) for headings, Poppins for body — **only Poppins 400 and 600 are
+shipped**, so use `font-normal` or `font-semibold` and nothing else on body type. Each face is two files,
+`-latin` and `-latin-ext`; the latin-ext half carries č ć š ž đ and must never be dropped.
+
+### The logo
+
+No vector logo exists yet. `public/images/ascentia-wordmark.webp` is the brush wordmark **keyed out of a
+poster JPEG** (800px wide, transparent), and `<Wordmark lockup>` sets the "— EDUCATION —" line under it in
+HTML. `public/og.jpg` is a crop of the full logo poster. `public/favicon.svg` and `<PuzzlePiece>` share one
+hand-drawn path, and the PNG icons were rendered from that SVG. **Ask the client for the real logo files**
+and replace all of these.
+
+## Deployment
+
+Push to `main` → `.github/workflows/deploy.yml` builds and publishes `dist/` to GitHub Pages at
+**https://f0rg3t3ch.github.io/ascentia/**. There is no custom domain and no `public/CNAME` yet.
+
+The origin is typed out in four places that have to change together: `src/siteInfo.js` (`site.url`),
+`public/sitemap.xml`, `public/robots.txt` and `public/404.html`.
+
+### Launch checklist
+
+The site is deliberately hidden from search until the client approves it.
+
+1. Remove `<meta name="robots" content="noindex, follow">` from `index.html`. (`robots.txt` already allows
+   crawling — it has to, or Google never sees the noindex.)
+2. If there is a domain: add `public/CNAME`, set the DNS records for GitHub Pages, and change the origin in
+   the four places above.
+3. Verify the property in Google Search Console (a Domain property by DNS TXT, as on the sibling sites) and
+   submit `sitemap.xml`.
+4. Bump both `<lastmod>` values in `public/sitemap.xml`.
+
+## What's real, what's a draft
+
+**From the client's posters, verbatim:**
+
+- The name, the slogan "Small steps also reach big goals", "Learning through play, creativity, and
+  exploration", "Join us – let's grow, learn, and play together!", "Enrolling now!", "Ages 4–6".
+- "Learn Croatian and English!" with the For kids / For adults points.
+- `learning.items` (Emotional literacy; Empathy and belonging) — **in both languages**. This is the only
+  Croatian on the site that is her own.
+- The hero photo, the palette and the wordmark.
+
+**From her posters but not yet confirmed for the website:**
+
+- Phone `+385 98 182 1274`, email `edu.ascentia@gmail.com`, address `Mirka Kustića 2, Supetar`. The two
+  posters group the phone digits differently; the digits are the same.
+- "Enrolling now!" is time-sensitive — ask whether it still holds.
+
+**Drafted here, not hers — she must review all of it:**
+
+- **Every Croatian string except `learning.items`**: the slogan (`I mali koraci vode do velikih ciljeva`),
+  the hero lead, everything under `programmes`, `contact.heading`/`sub`, the meta description. These are
+  translations of her English poster text.
+- UI chrome in both languages: nav labels, the section headings "Programmes" and "What children learn",
+  button text, alt text, the meta descriptions.
+
+**Not on the site because nobody has supplied it:** prices, schedules, opening hours, staff names or bios,
+testimonials, social links, a contact form, a map.
+
+`public/images/portrait-{400,700,1100}.webp` is a portrait the client sent. It is **not used on the page**
+— who it shows has not been confirmed, and an About section needs a name and a bio from her — but anything
+in `public/` is published, so it is reachable by URL once the site is deployed.
+
+### Don't invent
+
+Use only what the client sends. If a section has no real content, leave it out rather than writing
+plausible filler — a page that says less is recoverable, one that says something untrue about her business
+is not. When she supplies Croatian wording, use hers and do not polish it.
